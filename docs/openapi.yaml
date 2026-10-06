@@ -1,0 +1,32 @@
+openapi: 3.1.0
+info:
+  title: Help Desk Ticketing API
+  version: 1.0.0
+  license: { name: MIT, identifier: MIT }
+servers: [{ url: 'http://localhost:8080' }]
+security: [{ bearerAuth: [] }]
+paths:
+  /api/auth/register:
+    post: { summary: Register a requester, security: [], responses: { '201': { description: Created }, '422': { description: Invalid input } } }
+  /api/auth/login:
+    post: { summary: Log in, security: [], responses: { '200': { description: Access token }, '401': { description: Invalid credentials } } }
+  /api/auth/logout:
+    post: { summary: Revoke the current session, responses: { '204': { description: Logged out }, '401': { description: Unauthorized } } }
+  /api/dashboard:
+    get: { summary: Ticket counts visible to the user, responses: { '200': { description: Dashboard }, '401': { description: Unauthorized } } }
+  /api/users:
+    post: { summary: Create a user as admin, responses: { '201': { description: Created }, '403': { description: Forbidden } } }
+  /api/tickets:
+    get: { summary: Search and filter visible tickets, responses: { '200': { description: Paginated tickets }, '401': { description: Unauthorized } } }
+    post: { summary: Create a ticket, responses: { '201': { description: Created }, '422': { description: Invalid input } } }
+  /api/tickets/{id}:
+    parameters: [{ name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }]
+    get: { summary: Read an accessible ticket, responses: { '200': { description: Ticket }, '403': { description: Ownership check failed }, '404': { description: Not found } } }
+    put: { summary: Assign or transition a ticket as agent or admin, responses: { '200': { description: Updated }, '409': { description: Invalid transition } } }
+  /api/tickets/{id}/comments:
+    parameters: [{ name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }]
+    get: { summary: List comments on an accessible ticket, responses: { '200': { description: Comments }, '403': { description: Forbidden } } }
+    post: { summary: Add a comment to an accessible ticket, responses: { '201': { description: Created }, '403': { description: Forbidden } } }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
